@@ -34,7 +34,6 @@ let
       nix
       parted
       util-linux
-      zfs
     ]
   );
 
@@ -48,7 +47,6 @@ let
     pkgs.vmTools.override {
       rootModules =
         [ "virtio_pci" "virtio_mmio" "virtio_blk" "virtio_balloon" "virtio_rng" "ext4" "unix" "9p" "9pnet_virtio" "crc32c_generic" ] ++
-        [ "zfs" ] ++
         (pkgs.lib.optional pkgs.stdenv.hostPlatform.isx86 "rtc_cmos");
       kernel = modulesTree;
     }
@@ -154,22 +152,8 @@ let
       # Clean /tmp
       find /mnt/tmp -mindepth 1 -delete
 
-      # Clean up disk from unused sectors
-      fstrim -av
-
       # Unmount all filesystems
       umount -Rv /mnt || :
-
-      # Trim and export all zfs zpools
-      for zpool in ${toString ( builtins.attrNames config.disko.devices.zpool ) }; do
-        echo Trimming zpool "$zpool"
-        zpool trim -w "$zpool"
-        echo Exporting zpool "$zpool"
-        zpool export "$zpool"
-      done
-
-      # Disconnect all volume groups
-      # for zpool in ''${toString ( builtins.attrNames (lib.attrValues config.disko.devices.zpool))}; do
 
       # done
     '')
