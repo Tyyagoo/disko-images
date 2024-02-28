@@ -126,10 +126,20 @@ let
         index=$(( $index + 1 ))
       done
 
+      # Create encryption keys
+      echo -n "pwd" > /tmp/secret.key 
+      dd bs=512 count=4 if=/dev/random of=/tmp/autogen.key iflag=fullblock
+
       # Run disko-create
       ${config.system.build.formatScript}
       # Run disko-mount
       ${config.system.build.mountScript}
+
+      cp -f /mnt/etc/nixos/hardware-configuration.nix ./systems/x86_64-linux/virt/hardware.nix
+      git add .
+      cp -r ../nix /mnt/home/tyyago/
+      dd bs=512 count=4 if=/tmp/autogen.key of=/mnt/persist/secret.key
+      chown root:root /mnt/persist/secret.key; chmod 400 /mnt/persist/secret.key
 
       # Install NixOS
 
