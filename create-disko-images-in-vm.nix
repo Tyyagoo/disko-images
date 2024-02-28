@@ -129,6 +129,7 @@ let
       # Create encryption keys
       echo -n "pwd" > /tmp/secret.key 
       dd bs=512 count=4 if=/dev/random of=/tmp/autogen.key iflag=fullblock
+      echo "Created encryption keys."
 
       # Run disko-create
       ${config.system.build.formatScript}
